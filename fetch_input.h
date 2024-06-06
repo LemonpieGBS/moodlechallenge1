@@ -325,3 +325,60 @@ void fetch_input_sn(std::string &input_string, char mask = ' ') {
     std::cout<<"\n";
 
 }
+
+// otro ejemplo de como editar fetch_input, fetch_input ISBN
+// solo caracteres numericos hasta 13 digitos y NO negativos
+void fetch_input_ISBN(std::string &input_string, char mask = ' ') {
+
+    const char BACKSPACE = 8;
+    const char RETURN = 13;
+    //const char ESCAPE = 27;
+
+    const char allowed_characters[] = {'0','1','2','3','4','5','6','7','8','9'};
+    bool is_allowed;
+
+    unsigned char ch = 0;
+
+    ch = getch();
+    while(ch != RETURN || input_string.length() != ISBN_ALLOWED) {
+
+        if(ch == BACKSPACE) {
+
+            if(input_string.length() != 0) {
+
+                std::cout<<"\b \b";
+                input_string.resize(input_string.length()-1);
+
+            }
+
+        } else if(ch==0 || ch==224) {
+
+            getch();
+            continue;
+
+        } else {
+
+            is_allowed = false;
+            for(int i = 0; i < (int) (sizeof(allowed_characters) / sizeof(allowed_characters[0])); i++) { if(ch == allowed_characters[i]) { is_allowed = true; break; }}
+            if(input_string.length() >= ISBN_ALLOWED) is_allowed = false;
+
+            if(is_allowed) {
+
+                input_string += ch;
+
+                if(input_string.length() != 0) {
+                    if(mask == ' ') std::cout<<input_string[input_string.length()-1];
+                    else std::cout<<mask;
+                }
+
+            }
+
+        }
+
+        ch = getch();
+
+    }
+
+    std::cout<<"\n";
+
+}
