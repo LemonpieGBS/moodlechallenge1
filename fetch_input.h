@@ -1,7 +1,5 @@
 #include <iostream>
-#include <stdio.h>
 #include <conio.h>
-#include <windows.h>
 #include <string>
 
 // Me he montado mi propio sistema de cin porque el cin es muy MUY inseguro porque al usuario le pido un entero

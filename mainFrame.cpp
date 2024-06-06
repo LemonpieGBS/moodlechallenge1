@@ -1,5 +1,4 @@
 #include <iostream>
-#include <stdio.h>
 
 // Se explica solo pero es la cantidad maxima de libros
 #define MAX_BOOK_AMOUNT 100
@@ -31,12 +30,14 @@ std::string version = "INDEV";
 
 // FUNCIONES DEL PROGRAMA
 std::string autoGenerateISBN();
+bool checkISBNavailability(BOOK book_arr[], int book_amount, std::string ISBN_INPUT);
 
 // MODULOS DEL PROGRAMA
 void mod_addBook(BOOK book_arr[], int &book_amount);
 
 int main() {
 
+    srand(time(0)); // Semilla aleatoria
     system("cls"); // Se que es mala practica usar system pero no me pueden forzar a usar otra cosa
 
     // Variables para el menu
@@ -79,7 +80,7 @@ int main() {
 
             fetch_input(fu_menu_input);
             if(validate_option(fu_menu_input,1,6)) break;
-            else printc("<rd>!-Esa no es una opcion valida! Escriba de nuevo: ");
+            else printc("<rd>!-Esa no es una opcion valida! <rs>Escriba de nuevo: ");
         }
 
         if(fu_menu_input == 6) break;
@@ -96,59 +97,109 @@ int main() {
 
 std::string autoGenerateISBN() {
 
+    // Los caracteres que vamos a usar
     char characters_to_use[] = {'0','1','2','3','4','5','6','7','8','9'};
     std::string return_ISBN;
 
+    // Repetimos este bucle las veces que indique los digitos del ISBN
     for(int i = 0; i < ISBN_ALLOWED; i++) {
 
+        // Generamos un numero aleatorio del 0 al 9 para acceder al arreglo
         int random_number = rand() % array_length(characters_to_use);
-        return_ISBN += characters_to_use[random_number];
 
+        // Añadimos el número generado al azar al ISBN
+        return_ISBN += characters_to_use[random_number];
     }
 
     return return_ISBN;
 }
 
+bool checkISBNavailability(BOOK book_arr[], int book_amount, std::string ISBN_INPUT) {
+
+    // Funcion para revisar disponibilidad de un ISBN
+
+    for(int i = 0; i < book_amount; i++) {
+        if(ISBN_INPUT == book_arr[i].ISBN) { return false; }
+        // ^ ^ ^ Ciclamos el arreglo y si encontramos un ISBN igual regresamos false
+    }
+
+    return true;
+    // Si la funcion no ha retornado significa que no se encontro ninguna coincidencia
+}
+
 void mod_addBook(BOOK book_arr[], int &book_amount) {
     system("cls");
 
+    // Imprimimos el titulo e indicamos que estamos en el menu de añadir libro
     set_color(10); titlePrint("LIBRARY_TITLE"); color_reset();
     printc("- <gr>Añadir libro a Biblioteca");
 
+    // Variables que usaremos luego
     BOOK new_book;
     std::string generate_auto;
 
+    // Pedimos al usuario que nos de el titulo del libro
     printc("\n\n\n  <lb>$- Inserte el titulo del libro\n  <rs>#: ");
     fetch_input(new_book.name);
 
+    // Pedimos al usuario que nos de el autor del libro
     printc("\n  <lb>$- Inserte el autor del libro\n  <rs>#: ");
     fetch_input(new_book.author);
 
-    printc("\n  <yw>?- Quisiera generar el ISBN automaticamente o introducirlo manualmente? <rs>(S/N)\n  #: ");
+    // Damos la opcion al usuario de autogenerar el ISBN o introducirlo manualmente
+    printc("\n  <yw>?- Quisiera generar el ISBN automaticamente? <rs>(S/N)\n  #: ");
     fetch_input_sn(generate_auto);
 
+    // Si el usuario indica que no quiere generar el ISBN damos a escribirlo
     uppercase(generate_auto);
     if(generate_auto == "N") {
-        printc("\n  <lb>$- Introduzca el ISBN (debe ser de " + std::to_string(ISBN_ALLOWED) + " digito(s))\n  <rs>#: ");
-        fetch_input_ISBN(new_book.ISBN);
+
+        // Pedimos al usuario que nos de el ISBN
+        printc("\n  <lb>$- Introduzca el ISBN (debe ser de " + std::to_string(ISBN_ALLOWED) + " digitos)\n  <rs>#: ");
+
+        while(true) {
+            fetch_input_ISBN(new_book.ISBN);
+
+            // Si el ISBN no esta disponible lo decimos y reiniciamos
+            if(!checkISBNavailability(book_arr,book_amount,new_book.ISBN)) { printc("  <rd>!: Este ISBN ya esta en uso! <rs>Escriba de nuevo: "); }
+            else break;
+        }
+
     } else {
-        new_book.ISBN = autoGenerateISBN();
+
+        while(true) {
+            new_book.ISBN = autoGenerateISBN();
+
+            // Bucle hasta que el ISBN generado este disponible
+            if(checkISBNavailability(book_arr,book_amount,new_book.ISBN)) break;
+        }
+
+        // Imprimir el ISBN generado de cortesía
         printc("\n  <gr>ISBN generado exitosamente: <rs>" + new_book.ISBN + "\n");
     }
 
-    printc("\n  <lb>$- Inserte el año de publicación (debe ser no menor a 1900)\n  <rs>#: ");
+    // Pedimos al usuario que nos de el año de publicación
+    printc("\n  <lb>$- Inserte el año de publicacion (debe ser no menor a 1900)\n  <rs>#: ");
 
+    // Creamos un contenedor para el año
     int year_container;
     while(true) {
+
         fetch_input(year_container);
+        // Si el año es menor al año minimo o mayor al año actual, es invalido
         if(year_container < MIN_YEAR || year_container > get_current_year()) {
-            printc("  <rd>!-Inserte un año valido! Escriba de nuevo: ");
+            printc("  <rd>!-Inserte un año valido! <rs>Escriba de nuevo: ");
         } else break;
     }
     new_book.year_published = year_container;
 
+    // Es mejor tener una variable de contenedor en lugar de editar el arreglo en tiempo real
     book_arr[book_amount] = new_book;
+
+    // Si el programa no se murio poniendo el nuevo libro, es exitoso!
     printc("\n<gr>El libro se ha creado con exito! <rs>Volviendo al menu...");
+
+    // Esperar 2 segundos para volver al menu
     Sleep(2000);
 
 }

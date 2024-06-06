@@ -1,10 +1,9 @@
 #include <iostream>
-#include <stdio.h>
 #include <windows.h>
+#include <algorithm>
 #include <conio.h>
 #include <string>
 #include <map>
-#include <algorithm>
 
 #define array_length(x) (int) (sizeof(x) / sizeof(*x))
 
