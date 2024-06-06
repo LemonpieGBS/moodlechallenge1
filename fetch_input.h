@@ -2,6 +2,10 @@
 #include <conio.h>
 #include <string>
 
+#define max_integer_length 15
+#define max_string_length 60
+#define max_float_length 30
+
 // Me he montado mi propio sistema de cin porque el cin es muy MUY inseguro porque al usuario le pido un entero
 // y el cabron me pone, y cito "ASKDJMKODASWMNDIOWQNUJOIWQEDUJI9OWEDFNBUJIEWFBYUHJ"
 
@@ -16,31 +20,43 @@
 // fetch_input(string) es la mas basica de todas, deja poner cualquier letra al usuario:
 void fetch_input(std::string &input_string, char mask = ' ') {
 
+    // Estos son los codigos ASCII de BACKSPACE y ENTER (Return) que usaremos para distintas cosas
     const char BACKSPACE = 8;
     const char RETURN = 13;
     //const char ESCAPE = 27;
 
     input_string = "";
-    const char allowed_characters[] = {' '};
+    const char allowed_characters[] = {' '}; // Un arreglo de caracteres permitidos, que en nuestro caso son todos
+    const char disallowed_characters[] = {'>','<'}; // Esto lo he agregado para no confundir al LOAD & SAVE system
+    
+    // Esto se usara para determinar si un caracter esta permitido
     bool is_allowed;
 
+    // El caracter que vamos a conseguir
     unsigned char ch = 0;
 
+    // getch() obtiene un solo caracter del usuario y devuelve el codigo ASCII, viene incluido en <conio.h>
     ch = getch();
-    while( ch != RETURN) {
 
-        if(ch == BACKSPACE) {
+    // Acabamos el bucle para que el usuario introduzca datos cuando 
+    while(ch != RETURN || input_string.length() <= 0) {
 
+        if(ch == BACKSPACE) { // Si el usuario presiono BACKSPACE, hay que hacer lo siguiente:
+
+            // Si el tamaño del string es mayor a 0
             if(input_string.length() != 0) {
 
+                // Retrocedemos un espacio, imprimimos espacio para borrar la ultima letra,\ y regresamos de nuevo
                 std::cout<<"\b \b";
+
+                // Resizeamos el string a uno menos de su tamaño actual
                 input_string.resize(input_string.length()-1);
 
             }
 
-        } else if(ch==0 || ch==224) {
+        } else if(ch == 0 || ch == 9) { // Si el caracter es vacio o TAB, usamos otro getch para ignorarlo
 
-            getch();
+            ch = getch();
             continue;
 
         } else {
@@ -51,6 +67,12 @@ void fetch_input(std::string &input_string, char mask = ' ') {
                 for(int i = 0; i < (int) (sizeof(allowed_characters) / sizeof(allowed_characters[0])); i++) { if(ch == allowed_characters[i]) { is_allowed = true; break; }}
 
             } else is_allowed = true;
+
+            for(int i = 0; i < (int) (sizeof(disallowed_characters) / sizeof(disallowed_characters[0])); i++) { if(ch == disallowed_characters[i]) { is_allowed = false; break; }}
+            // ^ ^ ^ Esto lo he añadido por lo que he puesto arriba lean
+
+            if(input_string.length() >= max_string_length) is_allowed = false;
+            // Poner un limite de cuantas letras se pueden poner
 
             if(is_allowed) {
 
@@ -65,9 +87,12 @@ void fetch_input(std::string &input_string, char mask = ' ') {
 
         }
 
+        // Al terminar, pasamos a que el usuario digite el siguiente caracter
         ch = getch();
 
     }
+
+    // Al terminar todo esto, usamos un \n para saltar de linea como cin y scanf()
     std::cout<<"\n";
 
 }
@@ -98,9 +123,9 @@ void fetch_input(int &target, char mask = ' ') {
 
             }
 
-        } else if(ch==0 || ch==224) {
+        } else if(ch==0 || ch == 9) {
 
-            getch();
+            ch = getch();
             continue;
 
         } else {
@@ -108,6 +133,9 @@ void fetch_input(int &target, char mask = ' ') {
             is_allowed = false;
             for(int i = 0; i < (int) (sizeof(allowed_characters) / sizeof(allowed_characters[0])); i++) { if(ch == allowed_characters[i]) { is_allowed = true; break; }}
             if(ch == '-' && input_string.length() != 0) is_allowed = false;
+
+            if(input_string.length() >= max_integer_length) is_allowed = false;
+            // Poner un limite de cuantas letras se pueden poner
 
             if(is_allowed) {
 
@@ -164,9 +192,9 @@ void fetch_input(float &target, char mask = ' ') {
 
             }
 
-        } else if(ch==0 || ch==224) {
+        } else if(ch==0 || ch == 9) {
 
-            getch();
+            ch = getch();
             continue;
 
         } else {
@@ -175,6 +203,9 @@ void fetch_input(float &target, char mask = ' ') {
             for(int i = 0; i < (int) (sizeof(allowed_characters) / sizeof(allowed_characters[0])); i++) { if(ch == allowed_characters[i]) { is_allowed = true; break; }}
             if(ch == '-' && input_string.length() != 0) is_allowed = false;
             if(ch == '.' && point_placed) is_allowed = false;
+
+            if(input_string.length() >= max_float_length) is_allowed = false;
+            // Poner un limite de cuantas letras se pueden poner
 
             if(is_allowed) {
 
@@ -226,9 +257,9 @@ void fetch_input(double &target, char mask = ' ') {
 
             }
 
-        } else if(ch==0 || ch==224) {
+        } else if(ch==0 || ch == 9) {
 
-            getch();
+            ch = getch();
             continue;
 
         } else {
@@ -237,6 +268,9 @@ void fetch_input(double &target, char mask = ' ') {
             for(int i = 0; i < (int) (sizeof(allowed_characters) / sizeof(allowed_characters[0])); i++) { if(ch == allowed_characters[i]) { is_allowed = true; break; }}
             if(ch == '-' && input_string.length() != 0) is_allowed = false;
             if(ch == '.' && point_placed) is_allowed = false;
+
+            if(input_string.length() >= max_float_length) is_allowed = false;
+            // Poner un limite de cuantas letras se pueden poner
 
             if(is_allowed) {
 
@@ -289,9 +323,9 @@ void fetch_input_sn(std::string &input_string, char mask = ' ') {
 
             }
 
-        } else if(ch==0 || ch==224) {
+        } else if(ch==0 || ch == 9) {
 
-            getch();
+            ch = getch();
             continue;
 
         } else {
@@ -350,9 +384,9 @@ void fetch_input_ISBN(std::string &input_string, char mask = ' ') {
 
             }
 
-        } else if(ch==0 || ch==224) {
+        } else if(ch==0 || ch == 9) {
 
-            getch();
+            ch = getch();
             continue;
 
         } else {
