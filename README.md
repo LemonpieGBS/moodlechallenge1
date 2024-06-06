@@ -2,7 +2,7 @@
 
 <p id="description">[EN] Just a little challenge proposed by Moodle &amp; Artemis-Dev ppl for fun. [ES] Un reto q puso esta gente por diversion estoy cansado jefe.</p>
 
-<p align="center"><img src="https://img.shields.io/badge/im-high-green" alt="shields"><img src="https://img.shields.io/badge/im-sleepy-purple" alt="shields"><img src="https://img.shields.io/badge/pq_me-hago_esto-red" alt="shields"></p>
+<p align="center"><img src="https://img.shields.io/badge/im-high-green" alt="shields">  <img src="https://img.shields.io/badge/im-sleepy-purple" alt="shields">  <img src="https://img.shields.io/badge/pq_me-hago_esto-red" alt="shields"></p>
 
 <h2>Project Screenshots // Muestras del Proyecto:</h2>
 
