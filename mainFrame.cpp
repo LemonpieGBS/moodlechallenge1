@@ -27,7 +27,7 @@ struct BOOK {
 };
 
 // La version del programa
-std::string version = "INDEV";
+std::string version = "v1.0.0";
 
 // FUNCIONES DEL PROGRAMA
 std::string autoGenerateISBN();
@@ -38,6 +38,7 @@ void showBooks(BOOK book_arr[], int book_amount, int minimum_year = 0);
 void mod_addBook(BOOK book_arr[], int &book_amount);
 void mod_showBooks(BOOK book_arr[], int book_amount);
 void mod_removeBook(BOOK book_arr[], int &book_amount);
+void mod_showRecentBooks(BOOK book_arr[], int book_amount);
 
 int main() {
 
@@ -56,7 +57,7 @@ int main() {
     set_color(10); titlePrint("MAIN_MENU"); color_reset();
 
     // Lo de los colores esta mejor explicado en el header file "external_functions.h"
-    printc("<lb>- Version: " + version + ", por <gr>LemonpieGBS");
+    printc("<lb>- Version: <gr>" + version + " <lb>por <gr>LemonpieGBS");
     printc("\nReto para <gr>Moodle <rs>y <gr>Artemis-Devs");
 
     // Imprimamos el menu inicial
@@ -79,25 +80,26 @@ int main() {
         printc("- <gr>Menu Principal de Biblioteca");
 
         // Menu principal
-        printc("\n\n\nElija la opcion deseada:\n  <yw>1. Mostrar libros\n  2. Agregar libro\n  3. Remover libro\n  4. Editar libro\n  5. Mostrar libros recientes\n  6. \\<- Salir\n\n<rs>#: ");
+        printc("\n\n\nElija la opcion deseada:\n  <yw>1. Mostrar libros\n  2. Agregar libro\n  3. Remover libro\n  4. Mostrar libros recientes\n  5. \\<- Salir\n\n<rs>#: ");
 
         while(true) {
 
             // Si la opcion se valida rompemos el loop, sino, seguimos pidiendo al usuario
             fetch_input(fu_menu_input);
 
-            if(validate_option(fu_menu_input,1,6)) break;
+            if(validate_option(fu_menu_input,1,5)) break;
             else printc("<rd>!-Esa no es una opcion valida! <rs>Escriba de nuevo: ");
         }
 
         // Si el usuario pide salir, salimos
-        if(fu_menu_input == 6) break;
+        if(fu_menu_input == 5) break;
 
         // Un switch para determinar que modulo llamar
         switch(fu_menu_input) {
             case(1): mod_showBooks(book_inventory, book_amount); break;
             case(2): mod_addBook(book_inventory, book_amount); break;
             case(3): mod_removeBook(book_inventory, book_amount); break;
+            case(4): mod_showRecentBooks(book_inventory, book_amount); break;
             default: break;
         }
 
@@ -307,7 +309,7 @@ void mod_removeBook(BOOK book_arr[], int &book_amount) {
     int book_to_remove = -1;
 
     // Pedimos al usuario el ISBN del libro a eliminar
-    printc("\n\n<lb>$-Inserte el ISBN del libro que desea eliminar\n<rs>#: ");
+    printc("\n\n\n<lb>$-Inserte el ISBN del libro que desea eliminar\n<rs>#: ");
 
     // Bucle infinito jjijiijijiji
     while(true) {
@@ -350,7 +352,7 @@ void mod_removeBook(BOOK book_arr[], int &book_amount) {
     printc("- <gr>Remover libro de biblioteca <rd>(Proceder con cuidado!)");
 
     // Se encontro el libro entonces preguntamos al usuario si esta seguro
-    printc("\n\nEl libro se ha encontrado: <gr>" + book_arr[book_to_remove].name + "<rd>, Esta seguro de quererlo eliminar? <rs>(S/N)\n#: ");
+    printc("\n\n\nEl libro se ha encontrado: <gr>" + book_arr[book_to_remove].name + "<rs>, Esta seguro de quererlo eliminar? (S/N)\n#: ");
     fetch_input_sn(current_confirmation);
 
     uppercase(current_confirmation);
@@ -377,4 +379,38 @@ void mod_removeBook(BOOK book_arr[], int &book_amount) {
     // Decir que se ha logrado
     printc("\n\n<gr>El libro se ha eliminado exitosamente! <rs>Volviendo al menu principal...");
     Sleep(2000);
+}
+
+void mod_showRecentBooks(BOOK book_arr[], int book_amount) {
+
+    system("cls");
+
+    // Imprimimos el titulo e indicamos que estamos en el menu de añadir libro
+    set_color(10); titlePrint("LIBRARY_TITLE"); color_reset();
+    printc("- <gr>Libros recientes en Biblioteca (no mas de " + std::to_string(CONSIDERED_RECENT) + " años) <lb>(Use 'ESC' para salir)");
+
+    printc("\n\n\n======================================================\n");
+
+    int books_eligible = 0; // Vamos a contar los libros que son elegibles
+    for(int i = 0; i < book_amount; i++) { if(book_arr[i].year_published >= get_current_year() - CONSIDERED_RECENT) books_eligible++; }
+    // get_current_year() - CONSIDERED RECENT, el año actual menos los 5 años para que un libro siga siendo reciente
+
+    // Detectar si hay libros sabes
+    if(books_eligible > 0) {
+
+        // Llamamos a la funcion de mostrar libros sin restriccion de año
+        showBooks(book_arr,book_amount,get_current_year() - CONSIDERED_RECENT);
+        // get_current_year() - CONSIDERED RECENT, el año actual menos los 5 años para que un libro siga siendo reciente
+
+    } else {
+
+        // Si no hay libros elegibles, imprimimos lo mismo
+        printc("\n  <rd>!: No hay libros recientes en biblioteca!\n");
+
+    }
+
+    printc("\n======================================================");
+
+    // Bucle infinito mientras no se presione enter
+    while(!(GetAsyncKeyState(VK_ESCAPE) < 0)) {}
 }
