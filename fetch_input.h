@@ -4,6 +4,18 @@
 #include <windows.h>
 #include <string>
 
+// Me he montado mi propio sistema de cin porque el cin es muy MUY inseguro porque al usuario le pido un entero
+// y el cabron me pone, y cito "ASKDJMKODASWMNDIOWQNUJOIWQEDUJI9OWEDFNBUJIEWFBYUHJ"
+
+// fetch_input, mi funcion, tiene varias ventajas:
+// - La escritura se obtiene a tiempo real (el string siempre esta siendo actualizado en lugar de recibir datos hasta cuando el usuario presiona enter)
+// - Se puede enmascarar el input del usuario, por ejemplo con '*' para una contraseña
+// - Gracias a la escritura a tiempo real, se puede prevenir el uso de caracteres no deseados como letras cuando se piden enteros
+// - Es muy facil de editar a conveniencia del programador
+
+// Todas estas funciones son overloads de fetch_input original preparadas para sus necesidades
+
+// fetch_input(string) es la mas basica de todas, deja poner cualquier letra al usuario:
 void fetch_input(std::string &input_string, char mask = ' ') {
 
     const char BACKSPACE = 8;
@@ -62,6 +74,7 @@ void fetch_input(std::string &input_string, char mask = ' ') {
 
 }
 
+// fetch_input(int) tiene parametros mas estrictos como el solo permitir numeros y solo poder poner un solo caracter - al principio
 void fetch_input(int &target, char mask = ' ') {
 
     const char BACKSPACE = 8;
@@ -120,6 +133,12 @@ void fetch_input(int &target, char mask = ' ') {
 
 }
 
+// fetch_input(float) y fetch_input(double) son casi lo mismo si no es que verdaderamente el mismo codigo, aqui los requerimentos:
+// - Solo se pueden introducir numeros, '-' y '.'
+// - Solo puede introducirse el punto UNA vez
+// - El caracter '-' solo puede introducirse una vez y debe ser al principio
+
+// Esto asegura que los usuarios no me maten al programa porque ya los veo
 void fetch_input(float &target, char mask = ' ') {
 
     const char BACKSPACE = 8;
@@ -244,6 +263,9 @@ void fetch_input(double &target, char mask = ' ') {
 
 }
 
+// Este es un ejemplo de una funcion customizada de fetch_input:
+// fetch_input_sn es para cuando el usuario debe decir SI o NO (S/N)
+// Solo permite un solo caracter, y debe ser 's','S','n' o 'N'
 void fetch_input_sn(std::string &input_string, char mask = ' ') {
 
     const char BACKSPACE = 8;
