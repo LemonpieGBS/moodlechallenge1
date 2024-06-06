@@ -37,6 +37,7 @@ void showBooks(BOOK book_arr[], int book_amount, int minimum_year = 0);
 // MODULOS DEL PROGRAMA
 void mod_addBook(BOOK book_arr[], int &book_amount);
 void mod_showBooks(BOOK book_arr[], int book_amount);
+void mod_removeBook(BOOK book_arr[], int &book_amount);
 
 int main() {
 
@@ -96,6 +97,7 @@ int main() {
         switch(fu_menu_input) {
             case(1): mod_showBooks(book_inventory, book_amount); break;
             case(2): mod_addBook(book_inventory, book_amount); break;
+            case(3): mod_removeBook(book_inventory, book_amount); break;
             default: break;
         }
 
@@ -126,7 +128,6 @@ std::string autoGenerateISBN() {
 bool checkISBNavailability(BOOK book_arr[], int book_amount, std::string ISBN_INPUT) {
 
     // Funcion para revisar disponibilidad de un ISBN
-
     for(int i = 0; i < book_amount; i++) {
         if(ISBN_INPUT == book_arr[i].ISBN) { return false; }
         // ^ ^ ^ Ciclamos el arreglo y si encontramos un ISBN igual regresamos false
@@ -137,13 +138,18 @@ bool checkISBNavailability(BOOK book_arr[], int book_amount, std::string ISBN_IN
 }
 
 void showBooks(BOOK book_arr[], int book_amount, int minimum_year) {
+
+    // Ciclamos por el arreglo entero de libros
     for(int i = 0; i < book_amount; i++) {
         
+        // Si el año del libro es menor al año mínimo, saltarlo
         if(book_arr[i].year_published < minimum_year) continue;
 
+        // Este es el formato con el que se mostraran los libros
         printc("\n  <gr>" + book_arr[i].name + "<rs> de <gr>" + book_arr[i].author);
         printc("\n  - Publicado en: <lb>" + std::to_string(book_arr[i].year_published) + "<rs>, ISBN: <lb>" + book_arr[i].ISBN + "\n");
     }
+
 }
 
 void mod_showBooks(BOOK book_arr[], int book_amount) {
@@ -154,20 +160,24 @@ void mod_showBooks(BOOK book_arr[], int book_amount) {
     set_color(10); titlePrint("LIBRARY_TITLE"); color_reset();
     printc("- <gr>Inventario de Biblioteca <lb>(Use 'ESC' para salir)");
 
-    printc("\n\n\n=======================================\n");
+    printc("\n\n\n======================================================\n");
 
+    // Detectar si hay libros sabes
     if(book_amount > 0) {
 
+        // Llamamos a la funcion de mostrar libros sin restriccion de año
         showBooks(book_arr,book_amount);
 
     } else {
 
+        // Si no hay libros, imprimimos lo mismo
         printc("\n  <rd>!: No hay libros en biblioteca!\n");
 
     }
 
-    printc("\n=======================================");
+    printc("\n======================================================");
 
+    // Bucle infinito mientras no se presione enter
     while(!(GetAsyncKeyState(VK_ESCAPE) < 0)) {}
 }
 
@@ -195,15 +205,15 @@ void mod_addBook(BOOK book_arr[], int &book_amount) {
     std::string generate_auto;
 
     // Pedimos al usuario que nos de el titulo del libro
-    printc("\n\n\n  <lb>$- Inserte el titulo del libro\n  <rs>#: ");
+    printc("\n\n\n  <lb>$-Inserte el titulo del libro\n  <rs>#: ");
     fetch_input(new_book.name);
 
     // Pedimos al usuario que nos de el autor del libro
-    printc("\n  <lb>$- Inserte el autor del libro\n  <rs>#: ");
+    printc("\n  <lb>$-Inserte el autor del libro\n  <rs>#: ");
     fetch_input(new_book.author);
 
     // Damos la opcion al usuario de autogenerar el ISBN o introducirlo manualmente
-    printc("\n  <yw>?- Quisiera generar el ISBN automaticamente? <rs>(S/N)\n  #: ");
+    printc("\n  <yw>?-Quisiera generar el ISBN automaticamente? <rs>(S/N)\n  #: ");
     fetch_input_sn(generate_auto);
 
     // Si el usuario indica que no quiere generar el ISBN damos a escribirlo
@@ -211,7 +221,7 @@ void mod_addBook(BOOK book_arr[], int &book_amount) {
     if(generate_auto == "N") {
 
         // Pedimos al usuario que nos de el ISBN
-        printc("\n  <lb>$- Introduzca el ISBN (debe ser de " + std::to_string(ISBN_ALLOWED) + " digitos)\n  <rs>#: ");
+        printc("\n  <lb>$-Introduzca el ISBN (debe ser de " + std::to_string(ISBN_ALLOWED) + " digitos)\n  <rs>#: ");
 
         while(true) {
             fetch_input_ISBN(new_book.ISBN);
@@ -235,7 +245,7 @@ void mod_addBook(BOOK book_arr[], int &book_amount) {
     }
 
     // Pedimos al usuario que nos de el año de publicación
-    printc("\n  <lb>$- Inserte el año de publicacion (debe ser no menor a 1900)\n  <rs>#: ");
+    printc("\n  <lb>$-Inserte el año de publicacion (debe ser no menor a 1900)\n  <rs>#: ");
 
     // Creamos un contenedor para el año
     int year_container;
@@ -254,9 +264,117 @@ void mod_addBook(BOOK book_arr[], int &book_amount) {
     book_amount++;
 
     // Si el programa no se murio poniendo el nuevo libro, es exitoso!
-    printc("\n<gr>El libro se ha creado con exito! <rs>Volviendo al menu...");
+    printc("\n\n<gr>El libro se ha creado con exito! <rs>Volviendo al menu...");
 
     // Esperar 2 segundos para volver al menu
     Sleep(2000);
 
+}
+
+void mod_removeBook(BOOK book_arr[], int &book_amount) {
+
+    system("cls");
+
+    // Imprimimos el titulo e indicamos que estamos en el menu de añadir libro
+    set_color(10); titlePrint("LIBRARY_TITLE"); color_reset();
+    printc("- <gr>Remover libro de biblioteca <rd>(Proceder con cuidado!)");
+
+    printc("\n\n\n======================================================\n");
+
+    // Detectar si hay libros sabes
+    if(book_amount > 0) {
+
+        // Llamamos a la funcion de mostrar libros sin restriccion de año
+        showBooks(book_arr,book_amount);
+
+    } else {
+
+        // Si no hay libros, imprimimos lo mismo
+        printc("\n  <rd>!: No hay libros en biblioteca!\n");
+
+    }
+
+    printc("\n======================================================");
+
+    // Si no hay libros, esperamos un poco y volvemos al programa inicial
+    if(book_amount == 0) {
+        Sleep(2000);
+        return;
+    }
+
+    // Variables que vamos a usar yay
+    std::string ISBN_input, current_confirmation;
+    int book_to_remove = -1;
+
+    // Pedimos al usuario el ISBN del libro a eliminar
+    printc("\n\n<lb>$-Inserte el ISBN del libro que desea eliminar\n<rs>#: ");
+
+    // Bucle infinito jjijiijijiji
+    while(true) {
+
+        // Recolectamos el ISBN a eliminar
+        fetch_input_ISBN(ISBN_input);
+
+        // Revisamos si existe el ISBN
+        for(int i = 0; i < book_amount; i++) {
+            
+            // Si si existe, guardamos su indice y rompemos el for
+            if(ISBN_input == book_arr[i].ISBN) {
+                book_to_remove = i;
+                break;
+            }
+
+        }
+
+        // Si no se encontro el libro, hacer lo siguiente:
+        if(book_to_remove == -1) {
+
+            // Pedir al usuario si quiere intentar de nuevo
+            printc("\n<rd>!-No se pudo encontrar el libro! Desea intentar de nuevo? <rs>(S/N)\n#: ");
+            fetch_input_sn(current_confirmation);
+
+            uppercase(current_confirmation);
+
+            // Si el resultado es no, salimos de la funcion
+            if(current_confirmation == "N") return;
+            else {
+                printc("\n<lb>$-Inserte el ISBN del libro que desea eliminar\n<rs>#: ");
+            }
+        } else break;
+    }
+
+    system("cls");
+
+    // Imprimimos el titulo e indicamos que estamos en el menu de añadir libro
+    set_color(10); titlePrint("LIBRARY_TITLE"); color_reset();
+    printc("- <gr>Remover libro de biblioteca <rd>(Proceder con cuidado!)");
+
+    // Se encontro el libro entonces preguntamos al usuario si esta seguro
+    printc("\n\nEl libro se ha encontrado: <gr>" + book_arr[book_to_remove].name + "<rd>, Esta seguro de quererlo eliminar? <rs>(S/N)\n#: ");
+    fetch_input_sn(current_confirmation);
+
+    uppercase(current_confirmation);
+
+    if(current_confirmation == "N") return;
+
+    // Preguntar si estan muy muy seguros
+    printc("\n<rd>!: ULTIMO AVISO, DESEA ELIMINAR EL LIBRO? <rs>(S/N)\n#: ");
+    fetch_input_sn(current_confirmation);
+
+    uppercase(current_confirmation);
+
+    if(current_confirmation == "N") return;
+
+    // ELIMINAMOS EL LIBRO
+    book_amount--;
+
+    // Empezamos en el libro que vamos a vaporizar asi es reemplazado
+    for(int i = book_to_remove; i < book_amount; i++) {
+        // Reemplazamos el libro actual con el siguiente
+        book_arr[i] = book_arr[i+1];
+    }
+
+    // Decir que se ha logrado
+    printc("\n\n<gr>El libro se ha eliminado exitosamente! <rs>Volviendo al menu principal...");
+    Sleep(2000);
 }

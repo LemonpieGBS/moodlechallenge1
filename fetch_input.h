@@ -334,6 +334,7 @@ void fetch_input_ISBN(std::string &input_string, char mask = ' ') {
 
     const char allowed_characters[] = {'0','1','2','3','4','5','6','7','8','9'};
     bool is_allowed;
+    input_string = "";
 
     unsigned char ch = 0;
 
