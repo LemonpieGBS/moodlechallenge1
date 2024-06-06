@@ -4,6 +4,7 @@
 #define MAX_BOOK_AMOUNT 100
 #define ISBN_ALLOWED 13
 #define MIN_YEAR 1900
+#define CONSIDERED_RECENT 5
 
 #include "titlePrint.h"
 #include "fetch_input.h"
@@ -31,9 +32,11 @@ std::string version = "INDEV";
 // FUNCIONES DEL PROGRAMA
 std::string autoGenerateISBN();
 bool checkISBNavailability(BOOK book_arr[], int book_amount, std::string ISBN_INPUT);
+void showBooks(BOOK book_arr[], int book_amount, int minimum_year = 0);
 
 // MODULOS DEL PROGRAMA
 void mod_addBook(BOOK book_arr[], int &book_amount);
+void mod_showBooks(BOOK book_arr[], int book_amount);
 
 int main() {
 
@@ -70,22 +73,28 @@ int main() {
 
         system("cls");
 
+        // Imprimimos el titulo e indicamos que estamos en el menu de añadir libro
         set_color(10); titlePrint("LIBRARY_TITLE"); color_reset();
         printc("- <gr>Menu Principal de Biblioteca");
 
         // Menu principal
-        printc("\n\n\nElija la opcion deseada:\n  <yw>1. Mostrar libros\n  2. Agregar libro\n  3. Remover libro\n  4. Editar libro\n  5. Filtrar libros (por año publicado)\n  6. \\<- Salir\n\n<rs>#: ");
+        printc("\n\n\nElija la opcion deseada:\n  <yw>1. Mostrar libros\n  2. Agregar libro\n  3. Remover libro\n  4. Editar libro\n  5. Mostrar libros recientes\n  6. \\<- Salir\n\n<rs>#: ");
 
         while(true) {
 
+            // Si la opcion se valida rompemos el loop, sino, seguimos pidiendo al usuario
             fetch_input(fu_menu_input);
+
             if(validate_option(fu_menu_input,1,6)) break;
             else printc("<rd>!-Esa no es una opcion valida! <rs>Escriba de nuevo: ");
         }
 
+        // Si el usuario pide salir, salimos
         if(fu_menu_input == 6) break;
+
+        // Un switch para determinar que modulo llamar
         switch(fu_menu_input) {
-            case(1): break;
+            case(1): mod_showBooks(book_inventory, book_amount); break;
             case(2): mod_addBook(book_inventory, book_amount); break;
             default: break;
         }
@@ -127,12 +136,59 @@ bool checkISBNavailability(BOOK book_arr[], int book_amount, std::string ISBN_IN
     // Si la funcion no ha retornado significa que no se encontro ninguna coincidencia
 }
 
+void showBooks(BOOK book_arr[], int book_amount, int minimum_year) {
+    for(int i = 0; i < book_amount; i++) {
+        
+        if(book_arr[i].year_published < minimum_year) continue;
+
+        printc("\n  <gr>" + book_arr[i].name + "<rs> de <gr>" + book_arr[i].author);
+        printc("\n  - Publicado en: <lb>" + std::to_string(book_arr[i].year_published) + "<rs>, ISBN: <lb>" + book_arr[i].ISBN + "\n");
+    }
+}
+
+void mod_showBooks(BOOK book_arr[], int book_amount) {
+
+    system("cls");
+
+    // Imprimimos el titulo e indicamos que estamos en el menu de añadir libro
+    set_color(10); titlePrint("LIBRARY_TITLE"); color_reset();
+    printc("- <gr>Inventario de Biblioteca <lb>(Use 'ESC' para salir)");
+
+    printc("\n\n\n=======================================\n");
+
+    if(book_amount > 0) {
+
+        showBooks(book_arr,book_amount);
+
+    } else {
+
+        printc("\n  <rd>!: No hay libros en biblioteca!\n");
+
+    }
+
+    printc("\n=======================================");
+
+    while(!(GetAsyncKeyState(VK_ESCAPE) < 0)) {}
+}
+
 void mod_addBook(BOOK book_arr[], int &book_amount) {
+    
     system("cls");
 
     // Imprimimos el titulo e indicamos que estamos en el menu de añadir libro
     set_color(10); titlePrint("LIBRARY_TITLE"); color_reset();
     printc("- <gr>Añadir libro a Biblioteca");
+
+    // Limite de libros que se pueden añadir
+    if(book_amount >= MAX_BOOK_AMOUNT) {
+
+        // Informamos al usuario que ha alcanzado el maximo de libros
+        printc("\n\n\n<rd>!: Se ha llegado al maximo de libros: <gr>" + std::to_string(MAX_BOOK_AMOUNT));
+        printc("\n<rs>Volviendo al menu inicial...");
+
+        Sleep(2000); // Esperamos 2 segundos a salir
+        return; // con return nos salimos de la funcion
+    }
 
     // Variables que usaremos luego
     BOOK new_book;
@@ -195,6 +251,7 @@ void mod_addBook(BOOK book_arr[], int &book_amount) {
 
     // Es mejor tener una variable de contenedor en lugar de editar el arreglo en tiempo real
     book_arr[book_amount] = new_book;
+    book_amount++;
 
     // Si el programa no se murio poniendo el nuevo libro, es exitoso!
     printc("\n<gr>El libro se ha creado con exito! <rs>Volviendo al menu...");
